@@ -36,19 +36,25 @@ jobs:
 
       # 4. .NET környezet beállítása
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
       # 5. Node.js modulok telepítése (npm install)
       - run: npm install -g vite
-
+      - run: npm install vite --save-dev
+        
       # 6. Projekt buildelése .NET-tel
-      - run: dotnet build
+      - run: npx vite build --outDir dist --base ./
+        timeout-minutes: 10
 
       # 7. Statikus fájlok generálása Vite segítségével
       - run: npx vite build --outDir ../dist --base ./
-        working-directory: wwwroot/
+        timeout-minutes: 10
+      
+      # .nojekyll fájl hozzáadása
+      - name: Add .nojekyll file
+        run: echo > dist/.nojekyll
 
       # 8. Telepítés GitHub Pages-re
       - name: Deploy to GitHub Pages

@@ -1,5 +1,5 @@
 namespace JsonToolboxWebApp
-
+open System
 open WebSharper
 open WebSharper.Sitelets
 open WebSharper.UI
