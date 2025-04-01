@@ -3,32 +3,57 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Repository letöltése
       - name: Checkout
         uses: actions/checkout@v2
         with:
           persist-credentials: false
           submodules: true
 
+      # 2. NuGet Cache beállítása
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # 3. Node.js Cache beállítása (npm)
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # 4. .NET környezet beállítása
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '9.0.x'
 
+      # 5. Node.js modulok telepítése (npm install)
       - run: npm install -g vite
 
+      # 6. Projekt buildelése .NET-tel
       - run: dotnet build
 
+      # 7. Statikus fájlok generálása Vite segítségével
       - run: npx vite build --outDir ../dist --base ./
         working-directory: wwwroot/
 
+      # 8. Telepítés GitHub Pages-re
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: dist
+
