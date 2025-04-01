@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -50,10 +51,32 @@ jobs:
         working-directory: wwwroot/
 
       # 8. Telepítés GitHub Pages-re
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: dist
 
+      # 9. GitHub CLI API hívás és issue létrehozása
+      - name: Create Issue with GitHub CLI
+        run: |
+          # API hívás az aktuális nyitott issue-k számának lekéréséhez
+          numOpenIssues=$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
+            query($name: String!, $owner: String!) {
+              repository(owner: $owner, name: $name) {
+                issues(states:OPEN) {
+                  totalCount
+                }
+              }
+            }' --jq '.data.repository.issues.totalCount')
+
+          echo "Open issues count is $numOpenIssues"
+
+          # Issue létrehozása az aktuális nyitott issue-k számával
+          gh issue create --title "Issue Report" --body "There are currently $numOpenIssues open issues in this repository." --repo $OWNER/$REPO
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
