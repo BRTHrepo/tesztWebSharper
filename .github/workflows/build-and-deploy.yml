@@ -57,7 +57,7 @@ jobs:
 
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
-        run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj --verbose
+        run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj /t:Build
       - name: Debug Build Logs (AFTER build)
         run: |
             if [ -d "bin/Debug" ]; then
