@@ -8,66 +8,43 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      # 1. Repository letöltése
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          submodules: true
-      
-      # 2. NuGet Cache beállítása
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-      
-      # 3. Node.js Cache beállítása (npm)
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
-      # 4. .NET környezet beállítása
-      - name: Setup .NET
+    steps:
+      # Repository letöltése
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # .NET környezet beállítása
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      # 5. Node.js modulok telepítése (npm install)
-      - run: npm install -g vite
-      - run: npm install vite --save-dev
-        
-      # 6. Projekt buildelése .NET-tel
-      - run: dotnet build
+      # Projekt buildelése WebSharper-rel (.NET)
+      - name: Build Project with WebSharper
+        run: dotnet build
 
-      # 7. Statikus fájlok generálása Vite segítségével
-      - run: npx vite build --outDir ../dist --base ./
-#        working-directory: wwwroot/
-        
-      # Scripts mappa másolása (ha szükséges)
-      - name: Copy WebíSharper scripts
+      # Scripts mappa másolása (WebSharper JavaScript fájlok)
+      - name: Copy WebíSharper scripts to dist/
         run: cp -r bin/Debug/Scripts/WebSharper dist/Scripts/WebSharper
-        timeout-minutes: 10
-      
+
+      # További HTML fájlok másolása
+      - name: Copy additional HTML files to dist/
+        run: cp bin/html/*.html dist/
+
       # .nojekyll fájl hozzáadása
       - name: Add .nojekyll file
         run: echo > dist/.nojekyll
 
-      # 8. Telepítés GitHub Pages-re
+      # Telepítés GitHub Pages-re 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: dist
-
+      
+      
       # 9. GitHub CLI API hívás és issue létrehozása
       - name: Create Issue with GitHub CLI
         run: |
