@@ -39,7 +39,11 @@ jobs:
         
       - name: Add WebSharper CLI to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
+          
+      # PATH frissítése (Linux/macOS)   
+      - name: Update PATH for tools
+        run: echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> $HOME/.bashrc && source $HOME/.bashrc
+   
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
         run: dotnet wsbuild JsonToolboxWebApp.fsproj -o dist
