@@ -53,6 +53,9 @@ jobs:
 
       - name: Debug Build Process
         run: ps aux | grep dotnet
+        
+      - name: Restore NuGet Packages
+        run: dotnet restore ./JsonToolboxWebApp.fsproj
 
 
       # Projekt buildelése WebSharper-rel (.NET)
