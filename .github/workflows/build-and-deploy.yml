@@ -23,10 +23,10 @@ jobs:
       # WebSharper NuGet Source hozzáadása
       - name: Add WebSharper NuGet Source
         run: |
-          dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json
-            --name dotnet-websharper-GitHub 
-            --username ${{ secrets.USERNAME }} 
-            --password ${{ secrets.PAT }}
+          dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json \
+            --name dotnet-websharper-GitHub  \
+            --username ${{ secrets.USERNAME }}  \
+            --password ${{ secrets.PAT }} \
             --store-password-in-clear-text 
         
       # WebSharper CLI telepítése
