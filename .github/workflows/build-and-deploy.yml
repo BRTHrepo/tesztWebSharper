@@ -51,6 +51,10 @@ jobs:
           echo "Searching for JsonToolboxWebApp.fsproj..."
           find . -name "JsonToolboxWebApp.fsproj"
 
+      - name: Debug Build Process
+        run: ps aux | grep dotnet
+
+
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
         run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj 
