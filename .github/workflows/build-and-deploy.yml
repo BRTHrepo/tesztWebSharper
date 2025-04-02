@@ -57,7 +57,7 @@ jobs:
 
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
-        run: dotnet build -v:diag
+        run: dotnet build -v:diag  --no-incremental
       # run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj 
       - name: Debug Build Logs (AFTER build)
         run: |
