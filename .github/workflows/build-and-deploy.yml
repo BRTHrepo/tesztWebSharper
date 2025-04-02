@@ -21,6 +21,10 @@ jobs:
           dotnet-version: '9.0.x'
 
       # WebSharper NuGet Source hozzáadása
+      - name: Debug Secrets
+        run: |
+          echo "GitHub Username: ${{ secrets.USERNAME }}"
+          echo "GitHub PAT is set."
       - name: Add WebSharper NuGet Source
         run: |
           dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json \
@@ -32,6 +36,9 @@ jobs:
       # WebSharper CLI telepítése
       - name: Install WebSharper CLI
         run: dotnet tool install -g dotnet-ws
+        
+      - name: Add WebSharper CLI to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
