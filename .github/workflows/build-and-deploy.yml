@@ -45,7 +45,12 @@ jobs:
       # PATH frissítése (Linux/macOS)   
       - name: Update PATH for tools
         run: echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> $HOME/.bashrc && source $HOME/.bashrc
-   
+    
+      - name: Find project file
+        run: |
+          echo "Searching for JsonToolboxWebApp.fsproj..."
+          find . -name "JsonToolboxWebApp.fsproj"
+
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
         run: dotnet ws build --project JsonToolboxWebApp.fsproj 
