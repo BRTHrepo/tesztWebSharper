@@ -63,8 +63,8 @@ jobs:
             find . -type f
           sleep 30
           done &
-          timeout 300 dotnet build -v:d  --no-incremental
-      
+        # timeout 300 dotnet build -v:d  --no-incremental
+          timeout 300 dotnet msbuild ./JsonToolboxWebApp.fsproj /t:Build -v:m --no-incremental
       # run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj 
 
       - name: Debug Build Outputs
