@@ -53,7 +53,7 @@ jobs:
 
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
-        run: dotnet ws build --project JsonToolboxWebApp.fsproj 
+        run: dotnet ws build --project ./JsonToolboxWebApp.fsproj 
 
       # WebSharper JavaScript fájlok másolása, ha léteznek
       - name: Copy WebSharper scripts to dist/
