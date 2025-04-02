@@ -50,10 +50,13 @@ jobs:
         run: |
           echo "Searching for JsonToolboxWebApp.fsproj..."
           find . -name "JsonToolboxWebApp.fsproj"
-
+      - name: Debug Build Logs
+        run: |
+            ls -l bin/Debug
+            cat bin/Debug/build.log || echo "No build log found"
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
-        run: dotnet ws build --project ./JsonToolboxWebApp.fsproj 
+        run: timeout 300 dotnet ws build --project JsonToolboxWebApp.fsproj 
 
       # WebSharper JavaScript fájlok másolása, ha léteznek
       - name: Copy WebSharper scripts to dist/
