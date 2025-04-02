@@ -45,11 +45,15 @@ jobs:
       - run: npm install vite --save-dev
         
       # 6. Projekt buildelése .NET-tel
-      - run: npx vite build --outDir dist --base ./
-        timeout-minutes: 10
+      - run: dotnet build
 
       # 7. Statikus fájlok generálása Vite segítségével
       - run: npx vite build --outDir ../dist --base ./
+#        working-directory: wwwroot/
+        
+      # Scripts mappa másolása (ha szükséges)
+      - name: Copy WebíSharper scripts
+        run: cp -r bin/Debug/Scripts/WebSharper dist/Scripts/WebSharper
         timeout-minutes: 10
       
       # .nojekyll fájl hozzáadása
