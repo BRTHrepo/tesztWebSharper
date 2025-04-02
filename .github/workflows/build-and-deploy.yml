@@ -20,36 +20,58 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      # WebSharper NuGet Source hozzáadása
+      - name: Add WebSharper NuGet Source
+        run: dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json --name dotnet-websharper-GitHub --username ${{ secrets.GITHUB_USERNAME }} --password ${{ secrets.GITHUB_PAT }}
+
+      # WebSharper CLI telepítése
+      - name: Install WebSharper CLI
+        run: dotnet tool install -g dotnet-ws
+
       # Projekt buildelése WebSharper-rel (.NET)
       - name: Build Project with WebSharper
-        run: dotnet build
+        run: dotnet wsbuild JsonToolboxWebApp.fsproj -o dist
 
-      # Scripts mappa másolása (WebSharper JavaScript fájlok)
-      - name: Copy WebíSharper scripts to dist/
-        run: cp -r bin/Debug/Scripts/WebSharper dist/Scripts/WebSharper
+      # WebSharper JavaScript fájlok másolása, ha léteznek
+      - name: Copy WebSharper scripts to dist/
+        run: |
+          if [ -d "bin/Debug/Scripts/WebSharper" ]; then
+            cp -r bin/Debug/Scripts/WebSharper dist/Scripts/WebSharper
+          else
+            echo "WebSharper scripts not found!"
+            exit 1
+          fi
 
-      # További HTML fájlok másolása
+      # HTML fájlok másolása, ha léteznek
       - name: Copy additional HTML files to dist/
-        run: cp bin/html/*.html dist/
+        run: |
+          if [ -d "bin/html" ]; then
+            cp bin/html/*.html dist/
+          else
+            echo "HTML files not found!"
+            exit 1
+          fi
 
-      # .nojekyll fájl hozzáadása
+      # .nojekyll fájl hozzáadása a GitHub Pages kompatibilitás miatt
       - name: Add .nojekyll file
         run: echo > dist/.nojekyll
 
-      # Telepítés GitHub Pages-re 
+      # Deploy a GitHub Pages-re a legújabb verzióval
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: dist
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: dist
       
-      
-      # 9. GitHub CLI API hívás és issue létrehozása
+      # GitHub CLI API hívás és issue létrehozása az aktuális nyitott issue-k számával
       - name: Create Issue with GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
         run: |
-          # API hívás az aktuális nyitott issue-k számának lekéréséhez
-          numOpenIssues=$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
+          numOpenIssues=$(gh api graphql -F owner="$OWNER" -F name="$REPO" -f query='
             query($name: String!, $owner: String!) {
               repository(owner: $owner, name: $name) {
                 issues(states:OPEN) {
@@ -60,10 +82,4 @@ jobs:
 
           echo "Open issues count is $numOpenIssues"
 
-          # Issue létrehozása az aktuális nyitott issue-k számával
-          gh issue create --title "Issue Report" --body "There are currently $numOpenIssues open issues in this repository." --repo $OWNER/$REPO
-
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
+          gh issue create --title "Issue Report" --body "There are currently $numOpenIssues open issues in this repository." --repo "$OWNER/$REPO"
