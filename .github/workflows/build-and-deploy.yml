@@ -4,131 +4,46 @@ on:
   push:
     branches:
       - main
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Repository letöltése
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          submodules: true
 
-      # .NET környezet beállítása
-      - name: Setup .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: |
-            6.0.x
-          # 9.0.x
+          dotnet-version: '8.0.x'
 
-      # WebSharper NuGet Source hozzáadása
-      - name: Debug Secrets
-        run: |
-          echo "GitHub Username: ${{ secrets.USERNAME }}"
-          echo "GitHub PAT is set."
-      - name: Add WebSharper NuGet Source
+      - name: Add GitHub registry NuGet source
         run: |
           dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json \
-            --name dotnet-websharper-GitHub  \
-            --username ${{ secrets.USERNAME }}  \
-            --password ${{ secrets.PAT }} \
-            --store-password-in-clear-text 
-        
-      # WebSharper CLI telepítése
-      - name: Install WebSharper CLI
-        run: dotnet tool install -g dotnet-ws
-        
-      - name: Add WebSharper CLI to PATH
-        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          
-      # PATH frissítése (Linux/macOS)   
-      - name: Update PATH for tools
-        run: echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> $HOME/.bashrc && source $HOME/.bashrc
-    
-      - name: Find project file
-        run: |
-          echo "Searching for JsonToolboxWebApp.fsproj..."
-          find . -name "JsonToolboxWebApp.fsproj"
+            --name github \
+            --username BRTHrepo \
+            --password "${{ secrets.PAT }}" \
+            --store-password-in-clear-text
 
-      - name: Debug Build Process
-        run: ps aux | grep dotnet
-        
-      - name: Restore NuGet Packages
-        run: dotnet restore ./JsonToolboxWebApp.fsproj
-
-
-      # Projekt buildelése WebSharper-rel (.NET)
-      - name: Build Project with WebSharper
-        run: |
-          while true; do
-            echo "Checking build progress..."
-            find . -type f
-          sleep 30
-          done &
-          timeout 300 dotnet msbuild ./JsonToolboxWebApp.fsproj /t:Build 
-      # run: timeout 300 dotnet ws build --project ./JsonToolboxWebApp.fsproj 
-
-      - name: Debug Build Outputs
-        run: find . -type f
-        
-      - name: Debug Build Logs (AFTER build)
-        run: |
-            if [ -d "bin/Debug" ]; then
-            ls -l bin/Debug
-            cat bin/Debug/build.log || echo "No build log found"
-            else
-            echo "Debug directory not found! Build might have failed."
-            #  exit 1
-            fi
-      # WebSharper JavaScript fájlok másolása, ha léteznek
-      - name: Copy WebSharper scripts to dist/
-        run: |
-          if [ -d "bin/Debug/Scripts/WebSharper" ]; then
-            cp -r bin/Debug/Scripts/WebSharper dist/Scripts/WebSharper
-          else
-            echo "WebSharper scripts not found!"
-            exit 1
-          fi
-
+      - run: npm install -g vite
+      - run: dotnet build
+      - run: npx vite build --outDir ../../dist --base ./
+        working-directory: bin/html
       # HTML fájlok másolása, ha léteznek
       - name: Copy additional HTML files to dist/
         run: |
           if [ -d "bin/html" ]; then
-            cp bin/html/*.html dist/
+             cp -r bin/html/* dist/
           else
             echo "HTML files not found!"
             exit 1
           fi
 
-      # .nojekyll fájl hozzáadása a GitHub Pages kompatibilitás miatt
-      - name: Add .nojekyll file
-        run: echo > dist/.nojekyll
-
-      # Deploy a GitHub Pages-re a legújabb verzióval
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: dist
-      
-      # GitHub CLI API hívás és issue létrehozása az aktuális nyitott issue-k számával
-      - name: Create Issue with GitHub CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-        run: |
-          numOpenIssues=$(gh api graphql -F owner="$OWNER" -F name="$REPO" -f query='
-            query($name: String!, $owner: String!) {
-              repository(owner: $owner, name: $name) {
-                issues(states:OPEN) {
-                  totalCount
-                }
-              }
-            }' --jq '.data.repository.issues.totalCount')
-
-          echo "Open issues count is $numOpenIssues"
-
-          gh issue create --title "Issue Report" --body "There are currently $numOpenIssues open issues in this repository." --repo "$OWNER/$REPO"
+          GITHUB_TOKEN: ${{ secrets.FEED }}
+          BRANCH: gh-pages
+          FOLDER: dist
