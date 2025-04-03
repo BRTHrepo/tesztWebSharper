@@ -46,7 +46,7 @@
                 <a class="navbar-brand" href="#">Json Toolbox test</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav"><li class="active"><a href="./index.html">Home</a></li><li><a href="./about.html">About</a></li></ul>
+                <ul class="nav navbar-nav"><li class="active"><a href="index.html">Home</a></li><li><a href="about.html">About</a></li></ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="https://websharper.com">websharper.com</a></li>
                 </ul>
@@ -54,7 +54,7 @@
         </div>
     </nav>
     <div class="container">
-        <h1>Say Hi to JavaScript!</h1><div><div ws-1></div></div>
+        <h1>Say Hi to JavaScript!</h1><div><div id="ws32160121"></div></div>
     </div>
     <footer class="footer">
         <div class="container">
@@ -64,13 +64,18 @@
             </p>
         </div>
     </footer>
-    <script src="./Scripts/WebSharper/all.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-wsbundle.Runtime.ScriptBasePath = './Scripts/WebSharper/';
-let e1 = document.querySelector("[ws-1]");
-wsbundle.Main().ReplaceInDom(e1);
-});
+    <meta id='websharper-data' name='websharper-data' content='{"$TYPES":[["WebSharper","Web","FSharpInlineControl"]],"$DATA":{"$V":{"ws32160121":{"$T":0,"$V":{"args":[],"funcName":["JsonToolboxWebApp","Client","Main"]}}}}}' />
+<script src="Scripts/WebSharper.Core.JavaScript/Runtime.js" type="text/javascript" charset="UTF-8"></script><!--[if lte IE 7.0]>
+<script src="Scripts/WebSharper.Main/Json.js" type="text/javascript" charset="UTF-8"></script><![endif]-->
+<!--[if lte IE 11.0]>
+<script src="Scripts/WebSharper.UI/closest.js" type="text/javascript" charset="UTF-8"></script><![endif]-->
+<!--[if lte IE 9.0]>
+<script src="Scripts/WebSharper.Main/AnimFrame.js" type="text/javascript" charset="UTF-8"></script><![endif]-->
+<script src="Scripts/WebSharper.Main/WebSharper.Main.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/WebSharper.Collections/WebSharper.Collections.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/WebSharper.MathJS.Extensions/WebSharper.MathJS.Extensions.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/WebSharper.Web/WebSharper.Web.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/WebSharper.UI/WebSharper.UI.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/WebSharper.UI.Templating.Runtime/WebSharper.UI.Templating.Runtime.js" type="text/javascript" charset="UTF-8"></script><script src="Scripts/JsonToolboxWebApp/JsonToolboxWebApp.js" type="text/javascript" charset="UTF-8"></script><script type="text/javascript">
+if (typeof WebSharper !=='undefined') {
+  WebSharper.Runtime.ScriptBasePath = 'Scripts/';
+  WebSharper.Runtime.Start();
+}
 </script>
 
 <div style="display:none" ws-children-template="MainForm"><div>
