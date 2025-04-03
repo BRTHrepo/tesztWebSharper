@@ -3,8 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <StartAction>Program</StartAction>
-    <StartProgram>$([System.Environment]::GetEnvironmentVariable(`WinDir`))\explorer.exe</StartProgram>
+    <StartProgram>dotnet</StartProgram>
     <StartArguments>$(MSBuildThisFileDirectory)bin\html</StartArguments>
+    <StartWorkingDirectory>$(MSBuildThisFileDirectory)bin\html</StartWorkingDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +22,9 @@
     <PackageReference Include="WebSharper.MathJS" Version="8.0.0.540" />
     <PackageReference Include="WebSharper.UI" Version="8.0.0.540" />
   </ItemGroup>
+  <Target Name="ESBuildBundle" AfterTargets="WebSharperCompile">
+    <Exec Command="npm install" />
+    <Exec Command="node ./esbuild.config.mjs" />
+  </Target>
 
 </Project>
